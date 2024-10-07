@@ -1,7 +1,7 @@
 -- List of admin User IDs
 local admins = {
     2633490764, -- Replace with actual User IDs
-    87654321,
+    87654321,   -- Another example User ID
 }
 
 -- Function to check if a player is an admin
@@ -33,17 +33,17 @@ end
 -- Create the GUI only if the player is an admin
 local player = game.Players.LocalPlayer
 if isAdmin(player) then
-    -- Create the ScreenGui
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "AdminGUI"
-    screenGui.Parent = player:WaitForChild("PlayerGui")
-
+    -- Create the ScreenGui (store it in ReplicatedStorage to keep it active)
+    local replicatedStorage = game:GetService("ReplicatedStorage")
+    local guiClone = replicatedStorage:FindFirstChild("AdminGUI") or Instance.new("ScreenGui")
+    guiClone.Name = "AdminGUI"
+    
     -- Create the Frame
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(0.3, 0, 0.5, 0)
     frame.Position = UDim2.new(0.35, 0, 0.25, 0)
     frame.BackgroundColor3 = Color3.new(0, 0, 0)
-    frame.Parent = screenGui
+    frame.Parent = guiClone
 
     -- Create the Close Button
     local closeButton = Instance.new("TextButton")
@@ -53,7 +53,7 @@ if isAdmin(player) then
     closeButton.Parent = frame
 
     closeButton.MouseButton1Click:Connect(function()
-        screenGui:Destroy()  -- Close the GUI
+        guiClone:Destroy()  -- Close the GUI
     end)
 
     -- Create a TextBox for command input
@@ -79,11 +79,11 @@ if isAdmin(player) then
             -- Help command
             if command:lower() == "help" then
                 print("Available Commands:")
-                print("1. kick <PlayerName> - Kicks the specified player.")
+                print("1. kick <PlayerName> <Reason> - Kicks the specified player with a reason.")
                 print("2. load <URL> - Loads and executes a script from the specified URL.")
                 print("3. unload - Unloads the admin GUI.")
                 print("4. announce <Message> - Announces a message to all players.")
-                print("5. give <PlayerName> <ItemID> - Gives the specified item to the player.")
+                print("5. give <PlayerName> 2633490764 - Gives the specified item to the player.")
                 print("6. help - Shows this help message.")
                 commandInput.Text = ""
                 return
@@ -99,20 +99,20 @@ if isAdmin(player) then
             end
 
             -- Give item command
-            local giveCommand = command:match("^give (%S+) (%d+)$")
+            local giveCommand = command:match("^give (%S+)$")
             if giveCommand then
-                local targetPlayerName, itemId = giveCommand:match("(%S+) (%d+)")
+                local targetPlayerName = giveCommand
                 local targetPlayer = findClosestPlayer(targetPlayerName)
                 
                 if targetPlayer then
                     local success, errorMessage = pcall(function()
                         local item = Instance.new("Tool")  -- Create a Tool instance
                         item.Name = "Item"  -- Set a default name for the item
-                        -- Here you can set the item properties like ID, etc. (requires specific setup)
+                        -- Set the item properties (you can customize this as needed)
                         item.Parent = targetPlayer.Backpack  -- Give the item to the target player’s backpack
                     end)
                     if success then
-                        print("Gave " .. targetPlayer.Name .. " the item with ID: " .. itemId)
+                        print("Gave " .. targetPlayer.Name .. " the item with ID: 2633490764")
                     else
                         print("Error giving item: " .. errorMessage)
                     end
@@ -123,13 +123,14 @@ if isAdmin(player) then
                 return
             end
 
-            -- Example command: Kick a player
-            local targetPlayerName = command:match("^kick (%S+)$")
-            if targetPlayerName then
+            -- Kick command with reason
+            local kickCommand = command:match("^kick (%S+) (.+)$")
+            if kickCommand then
+                local targetPlayerName, reason = kickCommand:match("(%S+) (.+)")
                 local targetPlayer = findClosestPlayer(targetPlayerName)
                 if targetPlayer then
-                    targetPlayer:Kick("You have been kicked by an admin.")
-                    print(targetPlayer.Name .. " has been kicked.")
+                    targetPlayer:Kick("You have been kicked by an admin: " .. reason)
+                    print(targetPlayer.Name .. " has been kicked. Reason: " .. reason)
                 else
                     print("Player not found matching: " .. targetPlayerName)
                 end
@@ -167,7 +168,38 @@ if isAdmin(player) then
     unloadButton.Parent = frame
 
     unloadButton.MouseButton1Click:Connect(function()
-        screenGui:Destroy()  -- Remove the GUI from the player
+        guiClone:Destroy()  -- Remove the GUI from the player
         print("Admin GUI unloaded.")
     end)
+
+    -- Create a ListBox for player selection
+    local playerList = Instance.new("ScrollingFrame")
+    playerList.Size = UDim2.new(0.8, 0, 0.3, 0)
+    playerList.Position = UDim2.new(0.1, 0, 0.5, 0)
+    playerList.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+    playerList.Parent = frame
+
+    local uiListLayout = Instance.new("UIListLayout")
+    uiListLayout.Parent = playerList
+
+    -- Populate the ListBox with players
+    local function populatePlayerList()
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            local playerButton = Instance.new("TextButton")
+            playerButton.Size = UDim2.new(1, 0, 0, 30)
+            playerButton.Text = player.Name
+            playerButton.Parent = playerList
+
+            playerButton.MouseButton1Click:Connect(function()
+                commandInput.Text = "kick " .. player.Name .. " <reason>"  -- Set the command input to kick the selected player with a placeholder for the reason
+            end)
+        end
+    end
+
+    populatePlayerList()
+
+    -- Parent the GUI to the PlayerGui, but keep a reference in ReplicatedStorage
+    guiClone.Parent = player:WaitForChild("PlayerGui")
+    replicatedStorage:ClearAllChildren() -- Clear any previous instances to avoid duplicates
+    guiClone:Clone().Parent = replicatedStorage -- Store the GUI in ReplicatedStorage
 end
