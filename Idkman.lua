@@ -1,7 +1,6 @@
 -- List of admin User IDs
 local admins = {
     2633490764, -- Replace with actual User IDs
-    87654321,   -- Another example User ID
 }
 
 -- Function to check if a player is an admin
@@ -14,13 +13,91 @@ local function isAdmin(player)
     return false
 end
 
--- Function to find the closest player match
+-- Create the GUI only if the player is an admin
+local player = game.Players.LocalPlayer
+if isAdmin(player) then
+    -- Create the ScreenGui
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "AdminGUI"
+    gui.Parent = player.PlayerGui
+
+    -- Main Frame
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0.4, 0, 0.6, 0)
+    frame.Position = UDim2.new(0.3, 0, 0.2, 0)
+    frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    frame.BorderSizePixel = 0
+    frame.Parent = gui
+
+    -- UICorner for rounded edges
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = frame
+
+    -- Title Label
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0.1, 0)
+    title.Position = UDim2.new(0, 0, 0, 0)
+    title.BackgroundTransparency = 1
+    title.Text = "Admin Panel"
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.Font = Enum.Font.SourceSansBold
+    title.TextSize = 28
+    title.Parent = frame
+
+    -- Close Button
+    local closeButton = Instance.new("TextButton")
+    closeButton.Size = UDim2.new(0.15, 0, 0.1, 0)
+    closeButton.Position = UDim2.new(0.85, 0, 0, 0)
+    closeButton.Text = "X"
+    closeButton.TextColor3 = Color3.fromRGB(255, 0, 0)
+    closeButton.Font = Enum.Font.SourceSansBold
+    closeButton.TextSize = 24
+    closeButton.BackgroundTransparency = 1
+    closeButton.Parent = frame
+
+    closeButton.MouseButton1Click:Connect(function()
+        gui:Destroy()  -- Close the GUI
+    end)
+
+    -- Command Input Box
+    local commandInput = Instance.new("TextBox")
+    commandInput.Size = UDim2.new(0.9, 0, 0.1, 0)
+    commandInput.Position = UDim2.new(0.05, 0, 0.15, 0)
+    commandInput.PlaceholderText = "Enter Command"
+    commandInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+    commandInput.Font = Enum.Font.SourceSans
+    commandInput.TextSize = 18
+    commandInput.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    commandInput.BorderSizePixel = 0
+    commandInput.Parent = frame
+
+    local inputCorner = Instance.new("UICorner")
+    inputCorner.CornerRadius = UDim.new(0, 5)
+    inputCorner.Parent = commandInput
+
+    -- Execute Button
+    local executeButton = Instance.new("TextButton")
+    executeButton.Size = UDim2.new(0.9, 0, 0.1, 0)
+    executeButton.Position = UDim2.new(0.05, 0, 0.3, 0)
+    executeButton.Text = "Execute"
+    executeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    executeButton.Font = Enum.Font.SourceSansBold
+    executeButton.TextSize = 20
+    executeButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+    executeButton.BorderSizePixel = 0
+    executeButton.Parent = frame
+
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(0, 5)
+    buttonCorner.Parent = executeButton
+end-- Function to find the closest player match
 local function findClosestPlayer(name)
     local closestPlayer = nil
-    local shortestDistance = math.huge  -- Start with a large distance
+    local shortestDistance = math.huge
 
     for _, player in pairs(game.Players:GetPlayers()) do
-        local distance = string.len(name) - string.len(player.Name)  -- Simple length comparison
+        local distance = string.len(name) - string.len(player.Name)
         if distance < shortestDistance then
             shortestDistance = distance
             closestPlayer = player
@@ -30,176 +107,115 @@ local function findClosestPlayer(name)
     return closestPlayer
 end
 
--- Create the GUI only if the player is an admin
-local player = game.Players.LocalPlayer
-if isAdmin(player) then
-    -- Create the ScreenGui (store it in ReplicatedStorage to keep it active)
-    local replicatedStorage = game:GetService("ReplicatedStorage")
-    local guiClone = replicatedStorage:FindFirstChild("AdminGUI") or Instance.new("ScreenGui")
-    guiClone.Name = "AdminGUI"
-    
-    -- Create the Frame
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0.3, 0, 0.5, 0)
-    frame.Position = UDim2.new(0.35, 0, 0.25, 0)
-    frame.BackgroundColor3 = Color3.new(0, 0, 0)
-    frame.Parent = guiClone
+-- Functionality for executing commands
+executeButton.MouseButton1Click:Connect(function()
+    local command = commandInput.Text
+    if command and command ~= "" then
+        print("Executing command: " .. command)
 
-    -- Create the Close Button
-    local closeButton = Instance.new("TextButton")
-    closeButton.Size = UDim2.new(0.2, 0, 0.1, 0)
-    closeButton.Position = UDim2.new(0.4, 0, 0.9, 0)
-    closeButton.Text = "Close"
-    closeButton.Parent = frame
-
-    closeButton.MouseButton1Click:Connect(function()
-        guiClone:Destroy()  -- Close the GUI
-    end)
-
-    -- Create a TextBox for command input
-    local commandInput = Instance.new("TextBox")
-    commandInput.Size = UDim2.new(0.8, 0, 0.2, 0)
-    commandInput.Position = UDim2.new(0.1, 0, 0.1, 0)
-    commandInput.PlaceholderText = "Enter Command"
-    commandInput.Parent = frame
-
-    -- Create an Execute Button
-    local executeButton = Instance.new("TextButton")
-    executeButton.Size = UDim2.new(0.2, 0, 0.1, 0)
-    executeButton.Position = UDim2.new(0.4, 0, 0.4, 0)
-    executeButton.Text = "Execute"
-    executeButton.Parent = frame
-
-    executeButton.MouseButton1Click:Connect(function()
-        local command = commandInput.Text
-        if command and command ~= "" then
-            -- Handle the command execution here
-            print("Executing command: " .. command)
-
-            -- Help command
-            if command:lower() == "help" then
-                print("Available Commands:")
-                print("1. kick <PlayerName> <Reason> - Kicks the specified player with a reason.")
-                print("2. load <URL> - Loads and executes a script from the specified URL.")
-                print("3. unload - Unloads the admin GUI.")
-                print("4. announce <Message> - Announces a message to all players.")
-                print("5. give <PlayerName> 2633490764 - Gives the specified item to the player.")
-                print("6. help - Shows this help message.")
-                commandInput.Text = ""
-                return
-            end
-
-            -- Announcement command
-            local announcement = command:match("^announce (.+)$")
-            if announcement then
-                game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer(announcement, "All")
-                print("Announcement sent: " .. announcement)
-                commandInput.Text = ""
-                return
-            end
-
-            -- Give item command
-            local giveCommand = command:match("^give (%S+)$")
-            if giveCommand then
-                local targetPlayerName = giveCommand
-                local targetPlayer = findClosestPlayer(targetPlayerName)
-                
-                if targetPlayer then
-                    local success, errorMessage = pcall(function()
-                        local item = Instance.new("Tool")  -- Create a Tool instance
-                        item.Name = "Item"  -- Set a default name for the item
-                        -- Set the item properties (you can customize this as needed)
-                        item.Parent = targetPlayer.Backpack  -- Give the item to the target player’s backpack
-                    end)
-                    if success then
-                        print("Gave " .. targetPlayer.Name .. " the item with ID: 2633490764")
-                    else
-                        print("Error giving item: " .. errorMessage)
-                    end
-                else
-                    print("Player not found matching: " .. targetPlayerName)
-                end
-                commandInput.Text = ""
-                return
-            end
-
-            -- Kick command with reason
-            local kickCommand = command:match("^kick (%S+) (.+)$")
-            if kickCommand then
-                local targetPlayerName, reason = kickCommand:match("(%S+) (.+)")
-                local targetPlayer = findClosestPlayer(targetPlayerName)
-                if targetPlayer then
-                    targetPlayer:Kick("You have been kicked by an admin: " .. reason)
-                    print(targetPlayer.Name .. " has been kicked. Reason: " .. reason)
-                else
-                    print("Player not found matching: " .. targetPlayerName)
-                end
-            elseif command:match("^load (.+)$") then
-                -- Command to load a script from GitHub
-                local url = command:match("^load (.+)$")
-                local success, result = pcall(function()
-                    return game:HttpGet(url) -- Fetch the code from the URL
-                end)
-                
-                if success then
-                    -- Use loadstring to execute the fetched code
-                    local func, loadError = loadstring(result)
-                    if func then
-                        func() -- Execute the loaded function
-                        print("Successfully executed script from: " .. url)
-                    else
-                        print("Error loading script: " .. loadError)
-                    end
-                else
-                    print("Error fetching script: " .. result)
-                end
-            end
-            
-            -- Clear the command input after execution
+        -- Help Command
+        if command:lower() == "help" then
+            print("Available Commands:")
+            print("1. kick <PlayerName> <Reason>")
+            print("2. load <URL>")
+            print("3. unload")
+            print("4. announce <Message>")
+            print("5. give <PlayerName> 2633490764")
+            print("6. help")
             commandInput.Text = ""
+
+        -- Kick Command
+        elseif command:lower():match("^kick (%S+) (.+)$") then
+            local targetPlayerName, reason = command:match("kick (%S+) (.+)")
+            local targetPlayer = findClosestPlayer(targetPlayerName)
+            if targetPlayer then
+                targetPlayer:Kick("Kicked by admin: " .. reason)
+                print(targetPlayer.Name .. " has been kicked. Reason: " .. reason)
+            else
+                print("Player not found")
+            end
+
+        -- Announcement Command
+        elseif command:lower():match("^announce (.+)$") then
+            local message = command:match("announce (.+)")
+            game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer(message, "All")
+            print("Announcement sent: " .. message)
+
+        -- Give Item Command
+        elseif command:lower():match("^give (%S+)$") then
+            local targetPlayerName = command:match("give (%S+)")
+            local targetPlayer = findClosestPlayer(targetPlayerName)
+            if targetPlayer then
+                local item = Instance.new("Tool")
+                item.Name = "Admin Item"
+                item.Parent = targetPlayer.Backpack
+                print("Gave " .. targetPlayer.Name .. " the item with ID: 2633490764")
+            else
+                print("Player not found")
+            end
         end
-    end)
-
-    -- Create an Unload Button
-    local unloadButton = Instance.new("TextButton")
-    unloadButton.Size = UDim2.new(0.2, 0, 0.1, 0)
-    unloadButton.Position = UDim2.new(0.4, 0, 0.7, 0)
-    unloadButton.Text = "Unload"
-    unloadButton.Parent = frame
-
-    unloadButton.MouseButton1Click:Connect(function()
-        guiClone:Destroy()  -- Remove the GUI from the player
-        print("Admin GUI unloaded.")
-    end)
-
-    -- Create a ListBox for player selection
-    local playerList = Instance.new("ScrollingFrame")
-    playerList.Size = UDim2.new(0.8, 0, 0.3, 0)
-    playerList.Position = UDim2.new(0.1, 0, 0.5, 0)
-    playerList.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
-    playerList.Parent = frame
-
-    local uiListLayout = Instance.new("UIListLayout")
-    uiListLayout.Parent = playerList
-
-    -- Populate the ListBox with players
-    local function populatePlayerList()
-        for _, player in ipairs(game.Players:GetPlayers()) do
-            local playerButton = Instance.new("TextButton")
-            playerButton.Size = UDim2.new(1, 0, 0, 30)
-            playerButton.Text = player.Name
-            playerButton.Parent = playerList
-
-            playerButton.MouseButton1Click:Connect(function()
-                commandInput.Text = "kick " .. player.Name .. " <reason>"  -- Set the command input to kick the selected player with a placeholder for the reason
-            end)
-        end
+        commandInput.Text = ""
     end
+end)
 
-    populatePlayerList()
+-- Player List for Selection
+local playerListFrame = Instance.new("ScrollingFrame")
+playerListFrame.Size = UDim2.new(0.9, 0, 0.35, 0)
+playerListFrame.Position = UDim2.new(0.05, 0, 0.45, 0)
+playerListFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+playerListFrame.BorderSizePixel = 0
+playerListFrame.ScrollBarThickness = 8
+playerListFrame.Parent = frame
 
-    -- Parent the GUI to the PlayerGui, but keep a reference in ReplicatedStorage
-    guiClone.Parent = player:WaitForChild("PlayerGui")
-    replicatedStorage:ClearAllChildren() -- Clear any previous instances to avoid duplicates
-    guiClone:Clone().Parent = replicatedStorage -- Store the GUI in ReplicatedStorage
+local listCorner = Instance.new("UICorner")
+listCorner.CornerRadius = UDim.new(0, 5)
+listCorner.Parent = playerListFrame
+
+local uiListLayout = Instance.new("UIListLayout")
+uiListLayout.Padding = UDim.new(0, 5)
+uiListLayout.Parent = playerListFrame
+
+-- Populate player list
+local function populatePlayerList()
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        local playerButton = Instance.new("TextButton")
+        playerButton.Size = UDim2.new(1, 0, 0, 40)
+        playerButton.Text = plr.Name
+        playerButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        playerButton.Font = Enum.Font.SourceSansBold
+        playerButton.TextSize = 18
+        playerButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+        playerButton.BorderSizePixel = 0
+        playerButton.Parent = playerListFrame
+
+        local buttonCorner = Instance.new("UICorner")
+        buttonCorner.CornerRadius = UDim.new(0, 5)
+        buttonCorner.Parent = playerButton
+
+        playerButton.MouseButton1Click:Connect(function()
+            commandInput.Text = "kick " .. plr.Name .. " <reason>"
+        end)
+    end
 end
+
+populatePlayerList()
+
+-- Unload Button
+local unloadButton = Instance.new("TextButton")
+unloadButton.Size = UDim2.new(0.9, 0, 0.1, 0)
+unloadButton.Position = UDim2.new(0.05, 0, 0.85, 0)
+unloadButton.Text = "Unload Admin GUI"
+unloadButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+unloadButton.Font = Enum.Font.SourceSansBold
+unloadButton.TextSize = 20
+unloadButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+unloadButton.BorderSizePixel = 0
+unloadButton.Parent = frame
+
+local unloadCorner = Instance.new("UICorner")
+unloadCorner.CornerRadius = UDim.new(0, 5)
+unloadCorner.Parent = unloadButton
+
+unloadButton.MouseButton1Click:Connect(function()
+    gui:Destroy()  -- Close the GUI
+end)
