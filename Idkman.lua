@@ -92,13 +92,37 @@ if isAdmin(player) then
     buttonCorner.CornerRadius = UDim.new(0, 5)
     buttonCorner.Parent = executeButton
 
-    -- Player List for Selection
+    -- Output Frame
+    local outputFrame = Instance.new("Frame")
+    outputFrame.Size = UDim2.new(0.9, 0, 0.35, 0)
+    outputFrame.Position = UDim2.new(0.05, 0, 0.45, 0)
+    outputFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    outputFrame.BorderSizePixel = 0
+    outputFrame.Parent = frame
+
+    local outputCorner = Instance.new("UICorner")
+    outputCorner.CornerRadius = UDim.new(0, 5)
+    outputCorner.Parent = outputFrame
+
+    -- Output TextLabel
+    local outputLabel = Instance.new("TextLabel")
+    outputLabel.Size = UDim2.new(1, 0, 1, 0)
+    outputLabel.BackgroundTransparency = 1
+    outputLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    outputLabel.Font = Enum.Font.SourceSans
+    outputLabel.TextSize = 16
+    outputLabel.TextWrapped = true
+    outputLabel.Text = "Output:"
+    outputLabel.Parent = outputFrame
+
+    -- Player List Frame
     local playerListFrame = Instance.new("ScrollingFrame")
-    playerListFrame.Size = UDim2.new(0.9, 0, 0.35, 0)
-    playerListFrame.Position = UDim2.new(0.05, 0, 0.45, 0)
+    playerListFrame.Size = UDim2.new(0.9, 0, 0.25, 0)
+    playerListFrame.Position = UDim2.new(0.05, 0, 0.8, 0)
     playerListFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     playerListFrame.BorderSizePixel = 0
     playerListFrame.ScrollBarThickness = 8
+    playerListFrame.Visible = false  -- Start hidden
     playerListFrame.Parent = frame
 
     local listCorner = Instance.new("UICorner")
@@ -150,11 +174,32 @@ if isAdmin(player) then
 
     populatePlayerList()
 
+    -- Toggle Player List Button
+    local toggleButton = Instance.new("TextButton")
+    toggleButton.Size = UDim2.new(0.9, 0, 0.1, 0)
+    toggleButton.Position = UDim2.new(0.05, 0, 0.95, 0)
+    toggleButton.Text = "Show Players"
+    toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    toggleButton.Font = Enum.Font.SourceSansBold
+    toggleButton.TextSize = 20
+    toggleButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    toggleButton.BorderSizePixel = 0
+    toggleButton.Parent = frame
+
+    local toggleCorner = Instance.new("UICorner")
+    toggleCorner.CornerRadius = UDim.new(0, 5)
+    toggleCorner.Parent = toggleButton
+
+    toggleButton.MouseButton1Click:Connect(function()
+        playerListFrame.Visible = not playerListFrame.Visible  -- Toggle visibility
+        toggleButton.Text = playerListFrame.Visible and "Hide Players" or "Show Players"  -- Change button text
+    end)
+
     -- Unload Button
     local unloadButton = Instance.new("TextButton")
     unloadButton.Size = UDim2.new(0.9, 0, 0.1, 0)
-    unloadButton.Position = UDim2.new(0.05, 0, 0.85, 0)
-    unloadButton.Text = "Unload Admin GUI"
+    unloadButton.Position = UDim2.new(0.05, 0, 1.05, 0)
+    unloadButton.Text = "Unload GUI"
     unloadButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     unloadButton.Font = Enum.Font.SourceSansBold
     unloadButton.TextSize = 20
@@ -167,55 +212,65 @@ if isAdmin(player) then
     unloadCorner.Parent = unloadButton
 
     unloadButton.MouseButton1Click:Connect(function()
-        gui:Destroy()  -- Close the GUI
+        gui:Destroy()  -- Unload the GUI
     end)
 
-    -- Functionality for executing commands
+    -- Execute command on button click
     executeButton.MouseButton1Click:Connect(function()
         local command = commandInput.Text
-        if command and command ~= "" then
-            print("Executing command: " .. command)
+        outputLabel.Text = ""  -- Clear previous output
 
-            -- Help Command
-            if command:lower() == "help" then
-                print("Available Commands:")
-                print("1. kick <PlayerName> <Reason>")
-                print("2. load <URL>")
-                print("3. unload")
-                print("4. announce <Message>")
-                print("5. give <PlayerName> 2633490764")
-                print("6. help")
-                commandInput.Text = ""
+        -- Help Command
+        if command:lower() == "help" then
+            outputLabel.Text = "Available Commands:\n1. kick <player> <reason>\n2. show players"
 
-            -- Kick Command
-            elseif command:lower():match("^kick (%S+) (.+)$") then
-                local targetPlayerName, reason = command:match("kick (%S+) (.+)")
-                local targetPlayer = findClosestPlayer(targetPlayerName)
-                if targetPlayer then
-                    targetPlayer:Kick("Kicked by admin: " .. reason)
-                    print(targetPlayer.Name .. " has been kicked. Reason: " .. reason)
-                else
-                    print("Player not found")
-                end
-
-            -- Announcement Command
-            elseif command:lower():match("^announce (.+)$") then
-                local message = command:match("announce (.+)")
-                game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer(message, "All")
-                print("Announcement sent: " .. message)
-
-            -- Give Item Command
-            elseif command:lower():match("^give (%S+)$") then
-                local targetPlayerName = command:match("give (%S+)")
-                local targetPlayer = findClosestPlayer(targetPlayerName)
-                if targetPlayer then
-                    print("Gave item 2633490764 to " .. targetPlayer.Name)
-                else
-                    print("Player not found")
-                end
+        -- Kick Command
+        elseif command:lower():match("^kick (%S+) (.+)$") then
+            local targetPlayerName, reason = command:match("kick (%S+) (.+)")
+            local targetPlayer = findClosestPlayer(targetPlayerName)
+            if targetPlayer then
+                targetPlayer:Kick("Kicked by admin: " .. reason)
+                outputLabel.Text = targetPlayer.Name .. " has been kicked. Reason: " .. reason
             else
-                print("Invalid command")
+                outputLabel.Text = "Player not found"
             end
+        else
+            outputLabel.Text = "Invalid command"
+        end
+    end)
+
+    -- Make GUI draggable
+    local dragging
+    local dragStart
+    local startPos
+
+    local function update(input)
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    frame.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            update(input)
         end
     end)
 end
