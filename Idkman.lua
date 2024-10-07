@@ -21,97 +21,170 @@ local function createScriptCreationGUI()
     local title = Instance.new("TextLabel")
     title.Size = UDim2.new(1, 0, 0.1, 0)
     title.BackgroundTransparency = 1
-    title.Text = "Script Creator"
+    title.Text = "RemoteEvent Creator"
     title.TextColor3 = Color3.fromRGB(255, 255, 255)
     title.Font = Enum.Font.SourceSansBold
     title.TextSize = 28
     title.Parent = frame
 
-    -- Code Input TextBox
-    local codeInput = Instance.new("TextBox")
-    codeInput.Size = UDim2.new(0.9, 0, 0.4, 0)
-    codeInput.Position = UDim2.new(0.05, 0, 0.15, 0)
-    codeInput.PlaceholderText = "Enter your Lua script here"
-    codeInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-    codeInput.Font = Enum.Font.SourceSans
-    codeInput.TextSize = 18
-    codeInput.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    codeInput.BorderSizePixel = 0
-    codeInput.ClearTextOnFocus = true
-    codeInput.MultiLine = true
-    codeInput.Parent = frame
+    -- Create RemoteEvent Button
+    local createButton = Instance.new("TextButton")
+    createButton.Size = UDim2.new(0.9, 0, 0.2, 0)
+    createButton.Position = UDim2.new(0.05, 0, 0.15, 0)
+    createButton.Text = "Create RemoteEvent"
+    createButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    createButton.Font = Enum.Font.SourceSansBold
+    createButton.TextSize = 20
+    createButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    createButton.BorderSizePixel = 0
+    createButton.Parent = frame
 
-    -- Execute Button
-    local executeButton = Instance.new("TextButton")
-    executeButton.Size = UDim2.new(0.9, 0, 0.1, 0)
-    executeButton.Position = UDim2.new(0.05, 0, 0.55, 0)
-    executeButton.Text = "Execute Script"
-    executeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    executeButton.Font = Enum.Font.SourceSansBold
-    executeButton.TextSize = 20
-    executeButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-    executeButton.BorderSizePixel = 0
-    executeButton.Parent = frame
+    -- Function to open naming GUI
+    local function openNamingGUI()
+        -- Create the Naming Frame
+        local namingFrame = Instance.new("Frame")
+        namingFrame.Size = UDim2.new(0.5, 0, 0.4, 0)
+        namingFrame.Position = UDim2.new(0.25, 0, 0.3, 0)
+        namingFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        namingFrame.Parent = gui
 
-    -- Output TextBox
-    local outputBox = Instance.new("TextBox")
-    outputBox.Size = UDim2.new(0.9, 0, 0.3, 0)
-    outputBox.Position = UDim2.new(0.05, 0, 0.65, 0)
-    outputBox.PlaceholderText = "Output"
-    outputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    outputBox.Font = Enum.Font.SourceSans
-    outputBox.TextSize = 18
-    outputBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    outputBox.BorderSizePixel = 0
-    outputBox.ClearTextOnFocus = false
-    outputBox.MultiLine = true
-    outputBox.TextWrapped = true
-    outputBox.Parent = frame
+        -- UICorner for naming frame
+        local namingCorner = Instance.new("UICorner")
+        namingCorner.Parent = namingFrame
 
-    -- Switch to Server-Sided Command Button
-    local commandBarButton = Instance.new("TextButton")
-    commandBarButton.Size = UDim2.new(0.9, 0, 0.1, 0)
-    commandBarButton.Position = UDim2.new(0.05, 0, 0.9, 0)
-    commandBarButton.Text = "Switch to Server Command Bar"
-    commandBarButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    commandBarButton.Font = Enum.Font.SourceSansBold
-    commandBarButton.TextSize = 20
-    commandBarButton.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
-    commandBarButton.BorderSizePixel = 0
-    commandBarButton.Parent = frame
+        -- Naming Title
+        local namingTitle = Instance.new("TextLabel")
+        namingTitle.Size = UDim2.new(1, 0, 0.2, 0)
+        namingTitle.BackgroundTransparency = 1
+        namingTitle.Text = "Name Your RemoteEvent"
+        namingTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+        namingTitle.Font = Enum.Font.SourceSansBold
+        namingTitle.TextSize = 24
+        namingTitle.Parent = namingFrame
 
-    -- Execute Button Functionality
-    executeButton.MouseButton1Click:Connect(function()
-        local code = codeInput.Text
-        if code and code ~= "" then
-            local success, errorMsg = pcall(function()
-                local output = loadstring(code)()  -- Execute the script
-                outputBox.Text = "Output:\n" .. (output or "Script executed successfully.")
+        -- RemoteEvent Name TextBox
+        local eventNameInput = Instance.new("TextBox")
+        eventNameInput.Size = UDim2.new(0.9, 0, 0.2, 0)
+        eventNameInput.Position = UDim2.new(0.05, 0, 0.25, 0)
+        eventNameInput.PlaceholderText = "Enter RemoteEvent Name"
+        eventNameInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+        eventNameInput.Font = Enum.Font.SourceSans
+        eventNameInput.TextSize = 18
+        eventNameInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        eventNameInput.BorderSizePixel = 0
+        eventNameInput.Parent = namingFrame
+
+        -- Create Event Button
+        local createEventButton = Instance.new("TextButton")
+        createEventButton.Size = UDim2.new(0.9, 0, 0.2, 0)
+        createEventButton.Position = UDim2.new(0.05, 0, 0.5, 0)
+        createEventButton.Text = "Create RemoteEvent"
+        createEventButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        createEventButton.Font = Enum.Font.SourceSansBold
+        createEventButton.TextSize = 20
+        createEventButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        createEventButton.BorderSizePixel = 0
+        createEventButton.Parent = namingFrame
+
+        -- Function Code Button
+        local functionCodeButton = Instance.new("TextButton")
+        functionCodeButton.Size = UDim2.new(0.9, 0, 0.2, 0)
+        functionCodeButton.Position = UDim2.new(0.05, 0, 0.75, 0)
+        functionCodeButton.Text = "Set Function Code"
+        functionCodeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        functionCodeButton.Font = Enum.Font.SourceSansBold
+        functionCodeButton.TextSize = 20
+        functionCodeButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+        functionCodeButton.BorderSizePixel = 0
+        functionCodeButton.Parent = namingFrame
+
+        -- Variable to hold function code
+        local functionCode = ""
+
+        -- Button functionality to set function code
+        functionCodeButton.MouseButton1Click:Connect(function()
+            local codeInputFrame = Instance.new("Frame")
+            codeInputFrame.Size = UDim2.new(0.5, 0, 0.4, 0)
+            codeInputFrame.Position = UDim2.new(0.25, 0, 0.3, 0)
+            codeInputFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            codeInputFrame.Parent = gui
+
+            local codeCorner = Instance.new("UICorner")
+            codeCorner.Parent = codeInputFrame
+
+            local codeTitle = Instance.new("TextLabel")
+            codeTitle.Size = UDim2.new(1, 0, 0.2, 0)
+            codeTitle.BackgroundTransparency = 1
+            codeTitle.Text = "Enter Function Code"
+            codeTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+            codeTitle.Font = Enum.Font.SourceSansBold
+            codeTitle.TextSize = 24
+            codeTitle.Parent = codeInputFrame
+
+            local codeInput = Instance.new("TextBox")
+            codeInput.Size = UDim2.new(0.9, 0, 0.5, 0)
+            codeInput.Position = UDim2.new(0.05, 0, 0.25, 0)
+            codeInput.PlaceholderText = "Function code here..."
+            codeInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+            codeInput.Font = Enum.Font.SourceSans
+            codeInput.TextSize = 18
+            codeInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            codeInput.BorderSizePixel = 0
+            codeInput.MultiLine = true
+            codeInput.Parent = codeInputFrame
+
+            local setCodeButton = Instance.new("TextButton")
+            setCodeButton.Size = UDim2.new(0.9, 0, 0.2, 0)
+            setCodeButton.Position = UDim2.new(0.05, 0, 0.8, 0)
+            setCodeButton.Text = "Set Function Code"
+            setCodeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            setCodeButton.Font = Enum.Font.SourceSansBold
+            setCodeButton.TextSize = 20
+            setCodeButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+            setCodeButton.BorderSizePixel = 0
+            setCodeButton.Parent = codeInputFrame
+
+            setCodeButton.MouseButton1Click:Connect(function()
+                functionCode = codeInput.Text
+                codeInputFrame:Destroy()  -- Close the function code input
+                print("Function code set!")
             end)
-            if not success then
-                outputBox.Text = "Error:\n" .. errorMsg  -- Show error in output box
-            end
-        else
-            outputBox.Text = "Error:\nNo code provided."  -- Warn if no code is entered
-        end
-    end)
+        end)
 
-    -- Command Bar Functionality
-    commandBarButton.MouseButton1Click:Connect(function()
-        local commandCode = codeInput.Text
-        if commandCode and commandCode ~= "" then
-            -- Execute command in server-side context
-            local success, errorMsg = pcall(function()
-                loadstring(commandCode)()  -- Execute the command
-                outputBox.Text = "Command executed successfully."
-            end)
-            if not success then
-                outputBox.Text = "Error:\n" .. errorMsg
+        -- Create Event Functionality
+        createEventButton.MouseButton1Click:Connect(function()
+            local eventName = eventNameInput.Text
+
+            if eventName and eventName ~= "" then
+                -- Create RemoteEvent in ReplicatedStorage
+                local remoteEvent = Instance.new("RemoteEvent")
+                remoteEvent.Name = eventName
+                remoteEvent.Parent = game.ReplicatedStorage
+
+                -- Connect function to the RemoteEvent if available
+                if functionCode and functionCode ~= "" then
+                    local success, errorMsg = pcall(function()
+                        local func = loadstring(functionCode)
+                        if func then
+                            remoteEvent.OnServerEvent:Connect(func)
+                        end
+                    end)
+
+                    if not success then
+                        print("Error creating function for RemoteEvent: " .. errorMsg)
+                    end
+                end
+
+                namingFrame:Destroy()  -- Close the naming GUI
+                print("RemoteEvent '" .. eventName .. "' created successfully!")
+            else
+                print("Please enter a valid name for the RemoteEvent.")
             end
-        else
-            outputBox.Text = "Error:\nNo command provided."  -- Warn if no command is entered
-        end
-    end)
+        end)
+    end
+
+    -- Button click event to open naming GUI
+    createButton.MouseButton1Click:Connect(openNamingGUI)
 end
 
 -- Create the GUI
