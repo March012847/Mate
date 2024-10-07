@@ -1,7 +1,7 @@
 -- List of admin User IDs
 local admins = {
     2633490764, -- Replace with actual User IDs
-    1234567890,
+    87654321,
 }
 
 -- Function to check if a player is an admin
@@ -12,6 +12,22 @@ local function isAdmin(player)
         end
     end
     return false
+end
+
+-- Function to find the closest player match
+local function findClosestPlayer(name)
+    local closestPlayer = nil
+    local shortestDistance = math.huge  -- Start with a large distance
+
+    for _, player in pairs(game.Players:GetPlayers()) do
+        local distance = string.len(name) - string.len(player.Name)  -- Simple length comparison
+        if distance < shortestDistance then
+            shortestDistance = distance
+            closestPlayer = player
+        end
+    end
+
+    return closestPlayer
 end
 
 -- Create the GUI only if the player is an admin
@@ -60,15 +76,62 @@ if isAdmin(player) then
             -- Handle the command execution here
             print("Executing command: " .. command)
 
+            -- Help command
+            if command:lower() == "help" then
+                print("Available Commands:")
+                print("1. kick <PlayerName> - Kicks the specified player.")
+                print("2. load <URL> - Loads and executes a script from the specified URL.")
+                print("3. unload - Unloads the admin GUI.")
+                print("4. announce <Message> - Announces a message to all players.")
+                print("5. give <PlayerName> <ItemID> - Gives the specified item to the player.")
+                print("6. help - Shows this help message.")
+                commandInput.Text = ""
+                return
+            end
+
+            -- Announcement command
+            local announcement = command:match("^announce (.+)$")
+            if announcement then
+                game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer(announcement, "All")
+                print("Announcement sent: " .. announcement)
+                commandInput.Text = ""
+                return
+            end
+
+            -- Give item command
+            local giveCommand = command:match("^give (%S+) (%d+)$")
+            if giveCommand then
+                local targetPlayerName, itemId = giveCommand:match("(%S+) (%d+)")
+                local targetPlayer = findClosestPlayer(targetPlayerName)
+                
+                if targetPlayer then
+                    local success, errorMessage = pcall(function()
+                        local item = Instance.new("Tool")  -- Create a Tool instance
+                        item.Name = "Item"  -- Set a default name for the item
+                        -- Here you can set the item properties like ID, etc. (requires specific setup)
+                        item.Parent = targetPlayer.Backpack  -- Give the item to the target player’s backpack
+                    end)
+                    if success then
+                        print("Gave " .. targetPlayer.Name .. " the item with ID: " .. itemId)
+                    else
+                        print("Error giving item: " .. errorMessage)
+                    end
+                else
+                    print("Player not found matching: " .. targetPlayerName)
+                end
+                commandInput.Text = ""
+                return
+            end
+
             -- Example command: Kick a player
             local targetPlayerName = command:match("^kick (%S+)$")
             if targetPlayerName then
-                local targetPlayer = game.Players:FindFirstChild(targetPlayerName)
+                local targetPlayer = findClosestPlayer(targetPlayerName)
                 if targetPlayer then
                     targetPlayer:Kick("You have been kicked by an admin.")
-                    print(targetPlayerName .. " has been kicked.")
+                    print(targetPlayer.Name .. " has been kicked.")
                 else
-                    print("Player not found: " .. targetPlayerName)
+                    print("Player not found matching: " .. targetPlayerName)
                 end
             elseif command:match("^load (.+)$") then
                 -- Command to load a script from GitHub
