@@ -1,9 +1,9 @@
 -- LocalScript
 
-local function createScriptCreationGUI()
+local function createAdminSystemGUI()
     -- Create the ScreenGui
     local gui = Instance.new("ScreenGui")
-    gui.Name = "ScriptCreationGUI"
+    gui.Name = "AdminSystem"
     gui.Parent = game.Players.LocalPlayer.PlayerGui
 
     -- Main Frame
@@ -21,7 +21,7 @@ local function createScriptCreationGUI()
     local title = Instance.new("TextLabel")
     title.Size = UDim2.new(1, 0, 0.1, 0)
     title.BackgroundTransparency = 1
-    title.Text = "RemoteEvent Creator"
+    title.Text = "Admin System"
     title.TextColor3 = Color3.fromRGB(255, 255, 255)
     title.Font = Enum.Font.SourceSansBold
     title.TextSize = 28
@@ -187,5 +187,5 @@ local function createScriptCreationGUI()
     createButton.MouseButton1Click:Connect(openNamingGUI)
 end
 
--- Create the GUI
-createScriptCreationGUI()
+-- Create the Admin System GUI
+createAdminSystemGUI()
