@@ -41,7 +41,7 @@ local function createScriptCreationGUI()
 
     -- Code Input TextBox
     local codeInput = Instance.new("TextBox")
-    codeInput.Size = UDim2.new(0.9, 0, 0.7, 0)
+    codeInput.Size = UDim2.new(0.9, 0, 0.4, 0)
     codeInput.Position = UDim2.new(0.05, 0, 0.25, 0)
     codeInput.PlaceholderText = "Enter your Lua script here"
     codeInput.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -56,7 +56,7 @@ local function createScriptCreationGUI()
     -- Create Button
     local createButton = Instance.new("TextButton")
     createButton.Size = UDim2.new(0.9, 0, 0.1, 0)
-    createButton.Position = UDim2.new(0.05, 0, 0.95, 0)
+    createButton.Position = UDim2.new(0.05, 0, 0.7, 0)
     createButton.Text = "Create Script"
     createButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     createButton.Font = Enum.Font.SourceSansBold
@@ -96,6 +96,37 @@ local function createScriptCreationGUI()
             end
         else
             warn("No code provided.")  -- Warn if no code is entered
+        end
+    end)
+
+    -- Server-Sided Command Bar Button
+    local commandBarButton = Instance.new("TextButton")
+    commandBarButton.Size = UDim2.new(0.9, 0, 0.1, 0)
+    commandBarButton.Position = UDim2.new(0.05, 0, 0.85, 0)
+    commandBarButton.Text = "Switch to Server Command Bar"
+    commandBarButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    commandBarButton.Font = Enum.Font.SourceSansBold
+    commandBarButton.TextSize = 20
+    commandBarButton.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
+    commandBarButton.BorderSizePixel = 0
+    commandBarButton.Parent = frame
+
+    -- Command Bar Functionality
+    commandBarButton.MouseButton1Click:Connect(function()
+        local commandCode = codeInput.Text
+        if commandCode and commandCode ~= "" then
+            -- Execute command in server-side context
+            local success, errorMsg = pcall(function()
+                loadstring(commandCode)()  -- Execute the command
+            end)
+            if not success then
+                warn("Error executing command: " .. errorMsg)
+            else
+                print("Command executed successfully.")
+                codeInput.Text = ""  -- Clear the input field
+            end
+        else
+            warn("No command provided.")  -- Warn if no command is entered
         end
     end)
 end
