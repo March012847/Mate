@@ -13,13 +13,12 @@ local function isAdmin(player)
     return false
 end
 
--- Create the GUI only if the player is an admin
-local player = game.Players.LocalPlayer
-if isAdmin(player) then
+-- Function to create the GUI
+local function createAdminGUI()
     -- Create the ScreenGui
     local gui = Instance.new("ScreenGui")
     gui.Name = "AdminGUI"
-    gui.Parent = player.PlayerGui
+    gui.Parent = game.Players.LocalPlayer.PlayerGui
 
     -- Main Frame
     local frame = Instance.new("Frame")
@@ -70,6 +69,7 @@ if isAdmin(player) then
     commandInput.TextSize = 18
     commandInput.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     commandInput.BorderSizePixel = 0
+    commandInput.ClearTextOnFocus = false  -- Prevents text from disappearing when clicked
     commandInput.Parent = frame
 
     local inputCorner = Instance.new("UICorner")
@@ -138,11 +138,11 @@ if isAdmin(player) then
         local closestPlayer = nil
         local shortestDistance = math.huge
 
-        for _, player in pairs(game.Players:GetPlayers()) do
-            local distance = string.len(name) - string.len(player.Name)
+        for _, plr in pairs(game.Players:GetPlayers()) do
+            local distance = string.len(name) - string.len(plr.Name)
             if distance < shortestDistance then
                 shortestDistance = distance
-                closestPlayer = player
+                closestPlayer = plr
             end
         end
 
@@ -197,8 +197,8 @@ if isAdmin(player) then
 
     -- Unload Button
     local unloadButton = Instance.new("TextButton")
-    unloadButton.Size = UDim2.new(0.9, 0, 0.1, 0)
-    unloadButton.Position = UDim2.new(0.05, 0, 1.05, 0)
+    unloadButton.Size = UDim2.new(0.15, 0, 0.1, 0)
+    unloadButton.Position = UDim2.new(0.85, 0, 0, 0)
     unloadButton.Text = "Unload GUI"
     unloadButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     unloadButton.Font = Enum.Font.SourceSansBold
@@ -273,4 +273,14 @@ if isAdmin(player) then
             update(input)
         end
     end)
+end
+
+-- Event to recreate GUI when the player's character is added
+game.Players.LocalPlayer.CharacterAdded:Connect(function()
+    createAdminGUI()  -- Recreate GUI when character respawns
+end)
+
+-- Create GUI on script execution
+if isAdmin(game.Players.LocalPlayer) then
+    createAdminGUI()
 end
